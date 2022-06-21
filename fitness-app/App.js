@@ -8,6 +8,8 @@ import { createBottomTabNavigator} from "@react-navigation/bottom-tabs"
 import { LoginScreen, HomeScreen, RegistrationScreen } from './src/screens';
 import { HomeScreenNavigator, SearchScreenNavigator, PostScreenNavigator, MapScreenNavigator, ProfileScreenNavigator } from './src/screens/CustomNavigation';
 import { decode, encode } from "base-64";
+import {firestore, auth} from "./src/firebase/config"
+import { collection, doc, getDoc } from 'firebase/firestore';
 import {MaterialCommunityIcons, FontAwesome5, Ionicons} from "react-native-vector-icons";
 if (!global.btoa){global.btoa = encode}
 if (!global.atob){global.atob = decode}
@@ -18,11 +20,31 @@ const Tab = createBottomTabNavigator();
 export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const usersRef = collection(firestore, 'users');
+    console.log("here")
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        getDoc(doc(usersRef, user.uid))
+          .then((document) => {
+            const userData = document.data()
+            setLoading(false)
+            setUser(userData)
+          })
+          .catch((error) => {
+            setLoading(false)
+          });
+      } else {
+        setLoading(false)
+      }
+    });
+  }, []);
   
   return (
     <NavigationContainer>
         { user ? (
-          <Tab.Navigator>
+          <Tab.Navigator screenOptions={{headerShown: false}}>
             <Tab.Screen name="Home Screen" options={{tabBarShowLabel: false, 
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="home" color={color} size={size} />
