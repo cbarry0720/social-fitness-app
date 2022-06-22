@@ -1,5 +1,6 @@
 import React from 'react'
 import { Text, View, Button} from 'react-native'
+import PostsFeed from '../../components/PostsFeed/PostsFeed';
 
 export default function HomeScreen({navigation, user, setUser}) {
 
@@ -9,9 +10,8 @@ export default function HomeScreen({navigation, user, setUser}) {
 
     return (
         <View>
-            <Text>Home Screen</Text>
-            <Button title='Logout' onPress={logout}/>
-            <Text>{user.email}</Text>
+            <PostsFeed/>
+            {/* <Button title='Logout' onPress={logout}/> */}
         </View>
     )
 }
