@@ -53,7 +53,7 @@ export {SearchScreenNavigator}
 const PostScreenNavigator = () => {
     return (
         <Stack.Navigator>
-            <Stack.Screen name="Post" component={PostScreen}/>
+            <Stack.Screen options={headerOptions} name="Post" component={PostScreen}/>
         </Stack.Navigator>
     )
 }
