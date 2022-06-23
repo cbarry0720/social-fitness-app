@@ -8,6 +8,7 @@ import PostScreen from "./PostScreen/PostScreen";
 import MapScreen from "./MapScreen/MapScreen";
 import ProfileScreen from "./ProfileScreen/ProfileScreen";
 import { Text } from "react-native";
+import WorkoutScreen from "../components/Workouts/WorkoutScreen";
 
 const Stack = createStackNavigator();
 
@@ -41,8 +42,8 @@ export {HomeScreenNavigator}
 
 const SearchScreenNavigator = () => {
     return (
-        <Stack.Navigator screenOptions={{headerShown: false}}>
-            <Stack.Screen name="Search" component={SearchScreen}/>
+        <Stack.Navigator screenOptions={{headerShown:false}}>
+            <Stack.Screen options={headerOptions} name="Search" component={SearchScreen}/>
         </Stack.Navigator>
     )
 }
@@ -51,7 +52,7 @@ export {SearchScreenNavigator}
 
 const PostScreenNavigator = () => {
     return (
-        <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Navigator>
             <Stack.Screen name="Post" component={PostScreen}/>
         </Stack.Navigator>
     )
@@ -73,6 +74,7 @@ const ProfileScreenNavigator = () => {
     return (
         <Stack.Navigator>
             <Stack.Screen options={headerOptions} name="Profile" component={ProfileScreen}/>
+            <Stack.Screen name="My Workout" options={({ route }) => ({ title: route.params.name })} component={WorkoutScreen}/>
         </Stack.Navigator>
     )
 }

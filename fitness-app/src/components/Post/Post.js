@@ -31,7 +31,6 @@ const getTimeDiff = function(time){
 }
 
 export default function Post({data}){
-    console.log((new Date).getTime())
     data = data.item
     return (
         <View style={styles.container}>

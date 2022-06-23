@@ -3,16 +3,6 @@ import {View, Text} from "react-native";
 import { FlatList, ScrollView } from "react-native-gesture-handler";
 import Post from "../Post/Post";
 
-const users = [
-    {
-
-    },
-    {
-        username:"tim",
-        image: "timprofile"
-    }
-]
-
 const posts = [
     {
         id:1,
