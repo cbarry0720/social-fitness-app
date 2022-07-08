@@ -41,10 +41,11 @@ const posts = [
 
 export default function PostsFeed(){
     return (
-    // <ScrollView scrollEnabled={true} style={{borderBottomWidth: 1, borderColor: "red", height: "100%"}}>
-    //     {posts.map((x, i) => <Post key={i} data={x}/>)}
-    // </ScrollView>
-    <View>
-        <FlatList style={{height:"100%"}} data={posts} keyExtractor={x => x.id} renderItem = { x => <Post data={x} />}/>
-    </View>
+    <ScrollView scrollEnabled={true}>
+        {posts.map((x, i) => <Post key={i} data={x}/>)}
+    </ScrollView>
+
+    // <View>
+    //     <FlatList style={{height:"100%"}} data={posts} keyExtractor={x => x.id} renderItem = { x => <Post data={x} />}/>
+    // </View>
 )}

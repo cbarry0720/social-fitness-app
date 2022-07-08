@@ -44,7 +44,7 @@ export default function ProfileScreen({navigation}) {
                     <Text>{userInfo.followers.length == 1 ? "Follower" : "Followers"}</Text>
                 </View>
                 <View style={{alignItems:"center"}}>
-                    <Image style={{width:75, height:75, borderRadius:"100%", padding:10}} source={require('../../../assets/profile.jpg')}/>
+                    <Image style={{width:75, height:75, borderRadius:100, padding:10}} source={require('../../../assets/profile.jpg')}/>
                     <Text>{userInfo.gym}</Text>
                     <Text>{userInfo.bio}</Text>
                 </View>

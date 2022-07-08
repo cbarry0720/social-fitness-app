@@ -14,7 +14,7 @@ export default StyleSheet.create({
         height: 40, 
         marginBottom: 10,
         marginRight: 10,
-        borderRadius:"100%"
+        borderRadius:100
     },
     header:{
         flex:1,
