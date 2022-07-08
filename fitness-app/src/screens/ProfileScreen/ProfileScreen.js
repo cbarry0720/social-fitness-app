@@ -22,6 +22,7 @@ export default function ProfileScreen({navigation}) {
         alert("COMING SOON!")
     }
 
+    //mock user info
     const userInfo = {
         username: "cbarry0720",
         image: 'fitness-app/assets/profile.jpg',
@@ -30,6 +31,8 @@ export default function ProfileScreen({navigation}) {
         followers: ['user1', "user2", "user3"],
         following: ["user1", "user3"]
     }
+
+    //JSX for profile page
     return (
         <ScrollView>
             <View>

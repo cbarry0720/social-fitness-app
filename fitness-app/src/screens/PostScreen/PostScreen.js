@@ -6,8 +6,10 @@ import { TouchableHighlight } from 'react-native-gesture-handler';
 
 export default function PostScreen({navigation}) {
 
-
+    //state for selected workout
     const [template, setTemplate] = useState(0);
+
+    //mock workout data
     const workoutList = [
         {
             name:"My Push Day",
@@ -28,6 +30,7 @@ export default function PostScreen({navigation}) {
     ]
     workoutList.unshift({name:"New Workout", exercises: []})
 
+    //popup menu (action sheet)
     const openMenu = function(){
         let options = workoutList.map(x => x.name)
         options.unshift("Cancel")
@@ -44,17 +47,21 @@ export default function PostScreen({navigation}) {
           );
     }
 
+    //close workout
     const endWorkout = () => {
         setTemplate(0);
     }
     
+    //starting page
     if(template == 0){
         return (
             <View>
                 <Button title='Start Workout' onPress={openMenu}/>
             </View>
         )
-    }else{
+    }
+    //currently working out / posting page
+    else{
         return (
             <View style={styles.container}>
                 <Text key={workoutList[template-1].name}>{workoutList[template-1].name}</Text>

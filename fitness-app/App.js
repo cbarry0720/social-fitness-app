@@ -14,16 +14,20 @@ import {MaterialCommunityIcons, FontAwesome5, Ionicons} from "react-native-vecto
 if (!global.btoa){global.btoa = encode}
 if (!global.atob){global.atob = decode}
 
+
+//navigators for navbar and buttons
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
+
+//main application
 export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  //on load, checks login credentials
   useEffect(() => {
     const usersRef = collection(firestore, 'users');
-    console.log("here")
     auth.onAuthStateChanged(user => {
       if (user) {
         getDoc(doc(usersRef, user.uid))
@@ -81,12 +85,3 @@ export default function App() {
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

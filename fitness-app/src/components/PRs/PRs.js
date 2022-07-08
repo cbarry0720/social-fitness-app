@@ -3,7 +3,10 @@ import {View, Text} from "react-native";
 
 
 export default function PRs(){
-    return (<View>
+
+    //TODO
+    return (
+    <View>
         <Text>PRs GO HERE!</Text>
     </View>)
 }

@@ -12,6 +12,7 @@ import WorkoutScreen from "../components/Workouts/WorkoutScreen";
 
 const Stack = createStackNavigator();
 
+//header icons
 const headerOptions = {
     headerLeft: () => (
     <TouchableOpacity>
