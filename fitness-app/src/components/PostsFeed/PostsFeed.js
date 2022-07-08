@@ -3,6 +3,7 @@ import {View, Text} from "react-native";
 import { FlatList, ScrollView } from "react-native-gesture-handler";
 import Post from "../Post/Post";
 
+//mock post data
 const posts = [
     {
         id:1,
@@ -40,6 +41,8 @@ const posts = [
 ]
 
 export default function PostsFeed(){
+
+    //JSX of feed of posts
     return (
     <ScrollView scrollEnabled={true}>
         {posts.map((x, i) => <Post key={i} data={x}/>)}

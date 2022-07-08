@@ -7,7 +7,7 @@ export default function HomeScreen({navigation, user, setUser}) {
     const logout = () => {
         setUser(null);
     }
-
+    //just returns the posts feed...i guess
     return (
         <View>
             <PostsFeed/>

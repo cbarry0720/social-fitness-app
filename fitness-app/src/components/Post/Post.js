@@ -3,6 +3,7 @@ import styles from "./styles";
 import { gym1, gym2, profile, timprofile } from "../../images";
 import {View, Text, Image} from "react-native";
 
+//mock images
 const imgMap = {
     gym1: gym1,
     gym2: gym2,
@@ -10,6 +11,7 @@ const imgMap = {
     timprofile: timprofile,
 }
 
+//calculate time since post
 const getTimeDiff = function(time){
     let now = (new Date).getTime();
     let diff = Math.abs(now - time.getTime())
@@ -29,7 +31,7 @@ const getTimeDiff = function(time){
     return `${parseInt(diff)}d`
 
 }
-
+//JSX of a single post
 export default function Post({data}){
     // data = data.item
     return (

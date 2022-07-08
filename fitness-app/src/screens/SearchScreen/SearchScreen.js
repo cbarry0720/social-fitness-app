@@ -6,6 +6,8 @@ import styles from './styles'
 
 export default function SearchScreen({navigation}) {
 
+
+    //JSX for search
     return (
         <View>
             <TextInput autoFocus={true} returnKeyType="search" keyboardType="web-search" clearButtonMode="always" style={styles.bar} placeholder="Search"/>

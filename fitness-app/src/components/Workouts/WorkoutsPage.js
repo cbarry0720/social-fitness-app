@@ -5,6 +5,8 @@ import {View, Text, TouchableOpacity} from "react-native";
 import { FlatList, ScrollView } from "react-native-gesture-handler";
 import WorkoutScreen from "./WorkoutScreen";
 
+
+//mock workout data
 const workoutList = [
     {
         name:"My Push Day",
@@ -26,15 +28,19 @@ const workoutList = [
 
 export default function WorkoutsPage(){
 
+
     const navigation = useNavigation()
 
+    //on workout button press
     const clickWorkout = (x) => {
         return () => {
             navigation.navigate("My Workout", x)
         }
     }
 
-    return (<View>
+    //JSX for List of Workouts withing Profile Page
+    return (
+    <View>
         <ScrollView style={styles.container}>
             {workoutList.map((x, i) => (
                 <TouchableOpacity key={i} onPress={clickWorkout(x)} style={styles.item_container}>
