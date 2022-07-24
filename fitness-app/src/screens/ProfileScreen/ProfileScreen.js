@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, View, Image} from 'react-native'
+import { Text, View, Image, Platform} from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import {Ionicons} from "react-native-vector-icons"
 import { useState } from 'react';
@@ -7,6 +7,8 @@ import PostsFeed from '../../components/PostsFeed/PostsFeed';
 import WorkoutsPage from '../../components/Workouts/WorkoutsPage';
 import PRs from '../../components/PRs/PRs';
 import ProgressPage from '../../components/ProgressPage/ProgressPage';
+import * as ImagePicker from 'expo-image-picker';
+import firebase from '../../firebase/config'
 
 export default function ProfileScreen({navigation}) {
 
@@ -22,6 +24,46 @@ export default function ProfileScreen({navigation}) {
         alert("COMING SOON!")
     }
 
+    ///Ibe testing stuff
+
+    const newPost = async () => {
+        // No permissions request is necessary for launching the image library
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+    
+        console.log(result);
+    
+        if (!result.cancelled) {
+            //still need to determine how to connect uploaded image to firebase - ibe
+            // uploadImage(result.uri, "test-image")
+            //   .then(() => {
+            //     Alert.alert("Success");
+            //   })
+            //   .catch((error) => {
+            //     Alert.alert(error);
+            //   });
+            alert("Image selected - firebase implementation coming soon");
+        }
+
+        uploadImage = async (uri, imageName) => {
+            const response = await fetch(uri);
+            const blob = await response.blob();
+        
+            let ref = firebase.storage().ref().child("images/" + imageName);
+            return ref.put(blob);
+          }
+        
+      };
+
+
+    ///Ibe testing stuff end 
+
+
+
     //mock user info
     const userInfo = {
         username: "cbarry0720",
@@ -35,8 +77,13 @@ export default function ProfileScreen({navigation}) {
     //JSX for profile page
     return (
         <ScrollView>
-            <View>
-                <Ionicons onPress={settingsClick} style={{alignSelf:"flex-end", paddingRight:10, paddingTop:10, fontSize:20}} name="settings"/>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                <View>
+                    <Ionicons onPress={newPost} style={{alignSelf:"flex-start", paddingTop:10, fontSize:30}} name="add"/>
+                </View>
+                <View>
+                    <Ionicons onPress={settingsClick} style={{alignSelf:"flex-end", paddingRight:10, paddingTop:10, fontSize:20}} name="settings"/>
+                </View>      
             </View>
             <View style={{flex:1, flexDirection:"row", justifyContent:"space-around"}}>
                 <Text style={{fontSize:24, padding:5}}>{userInfo.username}</Text>
