@@ -55,7 +55,6 @@ export default function Post({data}){
         getDownloadURL(ref(storage, data.images[0])).then( (x) => {
             setImages([x])
         })
-        console.log(userData, "RIGHT HERE")
     }, [data]);
 
     // data = data.item

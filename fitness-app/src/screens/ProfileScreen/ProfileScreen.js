@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Text, View, Image, Platform} from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import {Ionicons} from "react-native-vector-icons"
@@ -10,7 +10,7 @@ import ProgressPage from '../../components/ProgressPage/ProgressPage';
 import * as ImagePicker from 'expo-image-picker';
 import firebase from '../../firebase/config'
 
-export default function ProfileScreen({navigation}) {
+export default function ProfileScreen({navigation, userData}) {
 
     const [menu, setMenu] = useState(0);
 
@@ -77,14 +77,18 @@ export default function ProfileScreen({navigation}) {
     //JSX for profile page
     return (
         <ScrollView>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                <View>
-                    <Ionicons onPress={newPost} style={{alignSelf:"flex-start", paddingTop:10, fontSize:30}} name="add"/>
+            {
+                userData ?
+                (<></>) :
+                (<View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                    <View>
+                        <Ionicons onPress={newPost} style={{alignSelf:"flex-start", paddingTop:10, fontSize:30}} name="add"/>
+                    </View>
+                    <View>
+                        <Ionicons onPress={settingsClick} style={{alignSelf:"flex-end", paddingRight:10, paddingTop:10, fontSize:20}} name="settings"/>
+                    </View>      
                 </View>
-                <View>
-                    <Ionicons onPress={settingsClick} style={{alignSelf:"flex-end", paddingRight:10, paddingTop:10, fontSize:20}} name="settings"/>
-                </View>      
-            </View>
+            )}
             <View style={{flex:1, flexDirection:"row", justifyContent:"space-around"}}>
                 <Text style={{fontSize:24, padding:5}}>{userInfo.username}</Text>
             </View>

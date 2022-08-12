@@ -63,7 +63,6 @@ export default function PostsFeed({profilePage}){
     }
 
     const loadPosts = async () => {
-        console.log(userData, "there")
         const q = profilePage ? query(collection(firestore, "posts"), where("userId", "==", auth.currentUser.uid), orderBy("time", "desc")) : query(collection(firestore, "posts"), where("userId", "in", userData.following), orderBy("time", "desc"))
         getDocs(q).then((x) => {
             let tempPosts = []
@@ -71,8 +70,6 @@ export default function PostsFeed({profilePage}){
                 tempPosts.push(x.data())
             })
             setPosts(tempPosts);
-            console.log(tempPosts)
-            console.log("here")
         })
     }
     useEffect(() => {loadFollowers()}, []);

@@ -45,6 +45,7 @@ const SearchScreenNavigator = () => {
     return (
         <Stack.Navigator screenOptions={{headerShown:false}}>
             <Stack.Screen options={headerOptions} name="Search" component={SearchScreen}/>
+            <Stack.Screen options={headerOptions} name="Profile" component={ProfileScreen}/>
         </Stack.Navigator>
     )
 }
