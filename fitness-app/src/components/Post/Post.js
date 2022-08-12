@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./styles";
 import { gym1, gym2, profile, timprofile } from "../../images";
 import {View, Text, Image} from "react-native";
+import { firestore, storage } from "../../firebase/config";
+import { getDownloadURL, ref } from "firebase/storage";
+import { doc, getDoc } from "firebase/firestore";
 
 //mock images
 const imgMap = {
@@ -14,7 +17,7 @@ const imgMap = {
 //calculate time since post
 const getTimeDiff = function(time){
     let now = (new Date).getTime();
-    let diff = Math.abs(now - time.getTime())
+    let diff = Math.abs(now - (time.seconds * 1000))
     diff = diff / 1000
     if(diff < 60){
         return `${parseInt(diff)}s`
@@ -33,20 +36,42 @@ const getTimeDiff = function(time){
 }
 //JSX of a single post
 export default function Post({data}){
+
+    const [userData, setUserData] = useState({});
+    const [images, setImages] = useState([])
+
+    useEffect(() => {
+        const docRef = doc(firestore, "users", data.userId)
+        getDoc(docRef).then((x) => {
+            let uData = x.data()
+            getDownloadURL(ref(storage, uData.picture)).then( (x) => {
+                let temp = Object.assign({}, uData);
+                temp.picture = x;
+                setUserData(temp)
+            })
+        }).then(() => {
+
+        })
+        getDownloadURL(ref(storage, data.images[0])).then( (x) => {
+            setImages([x])
+        })
+        console.log(userData, "RIGHT HERE")
+    }, [data]);
+
     // data = data.item
     return (
         <View style={styles.container}>
             <View style={styles.header}>
                 <View style={{flex: 1, flexDirection: "row"}}>
-                    <Image style={styles.profilePic} source={imgMap[data.pfp]}/>
+                    <Image style={styles.profilePic} source={{uri: userData.picture}}/>
                     <View>
-                        <Text style={{fontSize:20, fontWeight: "bold"}}>{data.username}</Text>
+                        <Text style={{fontSize:20, fontWeight: "bold"}}>{userData.username}</Text>
                         <Text>{data.location}</Text>
                     </View>
                 </View>
                 <Text>{getTimeDiff(data.timePosted)}</Text>
             </View>
-            <Image style={styles.image} source={imgMap[data.images[0]]}/>
+            <Image style={styles.image} source={{uri: images[0]}}/>
             <Text style={styles.caption}>{data.caption}</Text>
             {data.comments.length > 0 ? <Text>View Comments</Text> : <></>}
         </View>

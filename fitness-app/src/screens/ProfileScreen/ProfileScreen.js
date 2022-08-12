@@ -63,7 +63,7 @@ export default function ProfileScreen({navigation}) {
                 <Text style={menu != 3 ? {fontSize:22} : {fontSize:22, fontWeight:"bold"}} onPress={changeMenu(3)}>Progress</Text>
             </View>
             <View>
-                {menu == 0 && <PostsFeed/>}
+                {menu == 0 && <PostsFeed profilePage={true}/>}
                 {menu == 1 && <WorkoutsPage/>}
                 {menu == 2 && <PRs/>}
                 {menu == 3 && <ProgressPage/>}
