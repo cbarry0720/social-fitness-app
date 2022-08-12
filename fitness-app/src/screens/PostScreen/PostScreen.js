@@ -1,15 +1,15 @@
 import React, { useState } from 'react'
-import { Text, View, Button, TextInput, Image} from 'react-native'
+import { Text, View, Button, TextInput, Image, Alert} from 'react-native'
 import styles from './styles';
 import { ActionSheetIOS } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import exercisesJSON from "../../../exercises.json";
 import ExerciseSearchList from '../../components/ExerciseSearchList/ExerciseSearchList';
 import * as ImagePicker from "expo-image-picker";
-import { storage, auth } from '../../firebase/config';
+import { storage, auth, firestore } from '../../firebase/config';
 import { ref, uploadBytesResumable } from 'firebase/storage';
+import { addDoc, collection, serverTimestamp, setDoc } from "firebase/firestore"
 import { Feather } from '@expo/vector-icons';
-import Swipeable from 'react-native-gesture-handler';
 
 export default function PostScreen({navigation}) {
 
@@ -73,12 +73,24 @@ export default function PostScreen({navigation}) {
 
     //close workout
     const endWorkout = async function(){
-        for(let i = 0; i < images.length; i++){
-                setTimeout(() => {uploadImageToStorage(images[i])}, 500*i);
-        }
-        setImages([])
-        setExercisesSearched([])
-        setWorkout({});
+        let path = `${Date.now()}-${auth.currentUser.uid}`
+        uploadImagesToStorage(0, path);
+        addDoc(collection(firestore, "posts"), {
+            caption:"",
+            comments:[],
+            exercises: workout.exercises,
+            images:images.map((x, i) => {
+                return path + i
+            }),
+            likes: [],
+            location:"",
+            time: serverTimestamp(),
+            userId: auth.currentUser.uid
+        }).then((x) => {
+            console.log(x.id);
+        }).catch((e) => {
+            Alert.alert("ERROR", e);
+        })
     }
     
     //adding an exercise with "add exercise" button
@@ -123,15 +135,20 @@ export default function PostScreen({navigation}) {
         });
     };
 
-   async  function uploadImageToStorage(uri) {
+   async function uploadImagesToStorage(i, path) {
+        if(i >= images.length){
+            setImages([])
+            setExercisesSearched([])
+            setWorkout({});
+            return;
+        }
         console.log("Uploading...")
-        let path = `${Date.now()}-${auth.currentUser.uid}`
-        let reference = ref(storage, path);
-        fetch(uri).then(async function(img){
+        let reference = ref(storage, path + i);
+        fetch(images[i]).then(async function(img){
             img.blob().then(async function(bytes){
                 uploadBytesResumable(reference, bytes).then(x => {
                     console.log("Upload Complete!")
-                    return true
+                    uploadImagesToStorage(i+1)
                 }).catch(e => {
                     console.error("error on upload")
                     console.error(e)
