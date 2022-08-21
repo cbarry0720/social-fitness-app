@@ -45,7 +45,9 @@ const SearchScreenNavigator = () => {
     return (
         <Stack.Navigator screenOptions={{headerShown:false}}>
             <Stack.Screen options={headerOptions} name="Search" component={SearchScreen}/>
-            <Stack.Screen options={headerOptions} name="Profile" component={ProfileScreen}/>
+            <Stack.Screen options={headerOptions} name="Profile">
+                {props => <ProfileScreen {...props}/>}
+            </Stack.Screen>
         </Stack.Navigator>
     )
 }
@@ -75,7 +77,9 @@ export {MapScreenNavigator}
 const ProfileScreenNavigator = () => {
     return (
         <Stack.Navigator>
-            <Stack.Screen options={headerOptions} name="Profile" component={ProfileScreen}/>
+            <Stack.Screen options={headerOptions} name="Profile">
+                {props => <ProfileScreen {...props}/>}
+            </Stack.Screen>
             <Stack.Screen name="My Workout" options={({ route }) => ({ title: route.params.name })} component={WorkoutScreen}/>
         </Stack.Navigator>
     )

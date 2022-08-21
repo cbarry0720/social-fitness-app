@@ -17,23 +17,27 @@ export default function SearchScreen({navigation}) {
             return
         }
         const q = query(collection(firestore, "users"), where("username", "==", text.toLowerCase()), limit(25))
-        let tempUsers = []
+        let tempUsers = [];
         getDocs(q).then((x) => {
             x.forEach((x) => {
                 tempUsers.push(x.data())
             })
             setUsers(tempUsers);
         }).then(()=> {
-            console.log(tempUsers)
             if(tempUsers.length == 0){
                 return
             }
             getDownloadURL(ref(storage, tempUsers[0].picture)).then( (x) => {
                 setImage(x)
-                console.log(x)
-                console.log(tempUsers[0].picture)
             })
         })
+    }
+
+    const openUser = (userData) => {
+        return () => {
+            console.log("USERDATA IN SEARCHSCREEN", userData)
+            navigation.navigate("Profile", {userDataParam: userData})
+        }
     }
 
     //JSX for search
@@ -42,7 +46,7 @@ export default function SearchScreen({navigation}) {
             <TextInput onChangeText={searchUsers} autoFocus={true} returnKeyType="search" keyboardType="web-search" clearButtonMode="always" style={styles.bar} placeholder="Search"/>
             {users.map((x, i) => {
                 return (
-                    <TouchableOpacity key={i} style={styles.user}>
+                    <TouchableOpacity onPress={openUser(x)} key={i} on style={styles.user}>
                         <Image style={styles.pfp} source={{uri: image}} />
                         <Text style={styles.userText}>{x.username}</Text>
                     </TouchableOpacity>

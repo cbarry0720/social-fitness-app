@@ -45,7 +45,7 @@ let postings = [
 
 
 
-export default function PostsFeed({profilePage}){
+export default function PostsFeed({profilePage, userId}){
 
     const [posts, setPosts] = useState([]);
     let userData = {}
@@ -63,7 +63,7 @@ export default function PostsFeed({profilePage}){
     }
 
     const loadPosts = async () => {
-        const q = profilePage ? query(collection(firestore, "posts"), where("userId", "==", auth.currentUser.uid), orderBy("time", "desc")) : query(collection(firestore, "posts"), where("userId", "in", userData.following), orderBy("time", "desc"))
+        const q = profilePage ? query(collection(firestore, "posts"), where("userId", "==", userId), orderBy("time", "desc")) : query(collection(firestore, "posts"), where("userId", "in", userData.following), orderBy("time", "desc"))
         getDocs(q).then((x) => {
             let tempPosts = []
             x.forEach((x) => {
@@ -72,7 +72,7 @@ export default function PostsFeed({profilePage}){
             setPosts(tempPosts);
         })
     }
-    useEffect(() => {loadFollowers()}, []);
+    useEffect(() => {loadFollowers()}, [userId]);
 
     const reformatPostData = (data, id) => {
         return {

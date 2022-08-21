@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Text, View, Image, Platform} from 'react-native'
+import { Text, View, Image, Platform, TouchableOpacity} from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import {Ionicons} from "react-native-vector-icons"
 import { useState } from 'react';
@@ -8,11 +8,27 @@ import WorkoutsPage from '../../components/Workouts/WorkoutsPage';
 import PRs from '../../components/PRs/PRs';
 import ProgressPage from '../../components/ProgressPage/ProgressPage';
 import * as ImagePicker from 'expo-image-picker';
-import firebase from '../../firebase/config'
+import firebase, { auth, firestore, storage } from '../../firebase/config'
+import styles from './styles';
+import { getDoc, doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { getDownloadURL, ref } from 'firebase/storage';
 
-export default function ProfileScreen({navigation, userData}) {
+export default function ProfileScreen({route, navigation}) {
 
     const [menu, setMenu] = useState(0);
+    const [image, setImage] = useState("");
+    const [userInfo, setUserInfo] = useState({
+        email: "",
+        username: "",
+        picture: "",
+        bio: "",
+        followers: [],
+        following: [],
+        id: 0,
+        fullName: ""
+    });
+
+    const userData = route && route.params ? route.params.userDataParam : undefined;
 
     const changeMenu = (x) =>{
         return function(){
@@ -58,63 +74,110 @@ export default function ProfileScreen({navigation, userData}) {
           }
         
       };
-
+      useEffect( () => {
+        let tempUserInfo = {}
+        console.log("USER DATA FOR PROFILE", userData)
+        if(!userData){
+            getDoc(doc(firestore, "users", auth.currentUser.uid)).then((x) => {
+                tempUserInfo = x.data()
+                setUserInfo(x.data())
+            }).then(() => {
+                getDownloadURL(ref(storage, tempUserInfo.picture)).then((x) => {
+                    setImage(x)
+                })}
+            ).catch((error) => {
+                console.log(error)
+            })
+        }else{
+            tempUserInfo = userData
+            setUserInfo(userData)
+            getDownloadURL(ref(storage, tempUserInfo.picture)).then((x) => {
+                setImage(x)
+            }).catch((error) => {
+                console.log(error)
+            })
+        }
+      }, [])
 
     ///Ibe testing stuff end 
 
+    const follow = () => {
+        const ref = doc(firestore, "users", userInfo.id);
+        updateDoc(ref, {followers: arrayUnion(auth.currentUser.uid)}).then(() => {
+            updateDoc(doc(firestore, "users", auth.currentUser.uid), {following: arrayUnion(userInfo.id)});
+        }).then(() => {
+            setUserInfo({...userInfo, followers: [...userInfo.followers, auth.currentUser.uid]});
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
 
-
-    //mock user info
-    const userInfo = {
-        username: "cbarry0720",
-        image: 'fitness-app/assets/profile.jpg',
-        gym: "Bridgewater Fitness",
-        bio: "I'm here to workout and post stuff",
-        followers: ['user1', "user2", "user3"],
-        following: ["user1", "user3"]
+    const unfollow = () => {
+        const ref = doc(firestore, "users", userInfo.id);
+        updateDoc(ref, {followers: userInfo.followers.filter((x) => x !== auth.currentUser.uid)}).then(() => {
+            updateDoc(doc(firestore, "users", auth.currentUser.uid), {following: userInfo.following.filter((x) => x !== userInfo.id)});
+        }).then(() => {
+            setUserInfo({...userInfo, followers: userInfo.followers.filter((x) => x !== auth.currentUser.uid)});
+        }).catch((error) => {
+            console.log(error)
+        })
     }
 
     //JSX for profile page
     return (
         <ScrollView>
-            {
-                userData ?
+            {/* {
+                userData != undefined ?
                 (<></>) :
-                (<View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                (<View style={styles.header}>
                     <View>
-                        <Ionicons onPress={newPost} style={{alignSelf:"flex-start", paddingTop:10, fontSize:30}} name="add"/>
+                        <Ionicons onPress={newPost} style={styles.add} name="add"/>
                     </View>
                     <View>
-                        <Ionicons onPress={settingsClick} style={{alignSelf:"flex-end", paddingRight:10, paddingTop:10, fontSize:20}} name="settings"/>
+                        <Ionicons onPress={settingsClick} style={styles.settings} name="settings"/>
                     </View>      
                 </View>
-            )}
-            <View style={{flex:1, flexDirection:"row", justifyContent:"space-around"}}>
-                <Text style={{fontSize:24, padding:5}}>{userInfo.username}</Text>
+            )} */}
+            <View style={styles.info}>
+                <Text style={styles.username}>{userInfo.username}</Text>
             </View>
-            <View style={{flex:1, flexDirection:"row", justifyContent:"space-around"}}>
-                <View style={{alignItems:"center"}}>
-                    <Text style={{fontSize:28}}>{userInfo.followers.length}</Text>
+            <View style={styles.info}>
+                <View style={styles.infoItem}>
+                    <Text style={styles.followers}>{userInfo.followers.length}</Text>
                     <Text>{userInfo.followers.length == 1 ? "Follower" : "Followers"}</Text>
                 </View>
-                <View style={{alignItems:"center"}}>
-                    <Image style={{width:75, height:75, borderRadius:100, padding:10}} source={require('../../../assets/profile.jpg')}/>
-                    <Text>{userInfo.gym}</Text>
-                    <Text>{userInfo.bio}</Text>
+                <View style={styles.infoItem}>
+                    <Image style={styles.pfp} source={{uri: image}}/>
+                    <TouchableOpacity onPress={() => navigation.navigate('EditProfile')}>
+                        {
+                            userInfo.id == auth.currentUser.uid ? 
+                            (<TouchableOpacity>
+                                <Text style={styles.edit}>Edit Profile</Text>
+                            </TouchableOpacity>) : 
+                            (userInfo.followers.includes(auth.currentUser.uid) ? 
+                            (<TouchableOpacity onPress={unfollow}>
+                                <Text>Unfollow</Text>
+                            </TouchableOpacity>) : 
+                            (<TouchableOpacity onPress={follow}>
+                                <Text>Follow</Text>
+                            </TouchableOpacity>))
+                        }
+                    </TouchableOpacity>
+                    <Text>{userInfo.bio ? userInfo.bio : ""}</Text>
                 </View>
-                <View style={{alignItems:"center"}}>
-                    <Text style={{fontSize:28}}>{userInfo.following.length}</Text>
+                <View style={styles.infoItem}>
+                    <Text style={styles.following}>{userInfo.following.length}</Text>
                     <Text>Following</Text>
                 </View>
             </View>
-            <View style={{flex:1, flexDirection:"row", justifyContent:"space-around", marginTop:5, borderTopWidth:1, borderBottomWidth:1, padding:5}}>
-                <Text style={menu != 0 ? {fontSize:22} : {fontSize:22, fontWeight:"bold"}} onPress={changeMenu(0)}>Posts</Text>
-                <Text style={menu != 1 ? {fontSize:22} : {fontSize:22, fontWeight:"bold"}} onPress={changeMenu(1)}>Workouts</Text>
-                <Text style={menu != 2 ? {fontSize:22} : {fontSize:22, fontWeight:"bold"}} onPress={changeMenu(2)}>PRs</Text>
-                <Text style={menu != 3 ? {fontSize:22} : {fontSize:22, fontWeight:"bold"}} onPress={changeMenu(3)}>Progress</Text>
+            <View style={Platform.OS == "ios" ? styles.menuIOS : styles.menuWeb}>
+                <Text style={menu != 0 ? styles.menuText : styles.menuTextBold} onPress={changeMenu(0)}>Posts</Text>
+                <Text style={menu != 1 ? styles.menuText : styles.menuTextBold} onPress={changeMenu(1)}>Workouts</Text>
+                <Text style={menu != 2 ? styles.menuText : styles.menuTextBold} onPress={changeMenu(2)}>PRs</Text>
+                <Text style={menu != 3 ? styles.menuText : styles.menuTextBold} onPress={changeMenu(3)}>Progress</Text>
             </View>
             <View>
-                {menu == 0 && <PostsFeed profilePage={true}/>}
+                {menu == 0 && (userInfo.id != 0 ? (<PostsFeed profilePage={true} userId = {userInfo.id}/>) : (<></>))}
                 {menu == 1 && <WorkoutsPage/>}
                 {menu == 2 && <PRs/>}
                 {menu == 3 && <ProgressPage/>}

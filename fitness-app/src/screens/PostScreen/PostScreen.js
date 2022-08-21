@@ -10,9 +10,9 @@ import { storage, auth, firestore } from '../../firebase/config';
 import { ref, uploadBytesResumable } from 'firebase/storage';
 import { addDoc, collection, serverTimestamp, setDoc } from "firebase/firestore"
 import { Feather } from '@expo/vector-icons';
+import { Platform } from 'react-native';
 
 export default function PostScreen({navigation}) {
-
     //
     const [images, setImages] = useState([]);
 
@@ -47,19 +47,25 @@ export default function PostScreen({navigation}) {
 
     //popup menu (action sheet)
     const openMenu = function(){
-        let options = workoutList.map(x => x.name)
-        options.unshift("Cancel")
-        ActionSheetIOS.showActionSheetWithOptions(
-            {
-              options: options,
-              cancelButtonIndex: 0,
-              userInterfaceStyle: 'light',
-              destructiveButtonIndex: 1
-            },
-            buttonIndex => {
-                buttonIndex != 0 ? setWorkout(workoutList[buttonIndex-1]) : ""
-            }
-          );
+        console.log(Platform.OS)
+        if(Platform.OS == "web"){
+            setWorkout(workoutList[0])
+        }
+        else if(Platform.OS == "ios"){
+            let options = workoutList.map(x => x.name)
+            options.unshift("Cancel")
+            ActionSheetIOS.showActionSheetWithOptions(
+                {
+                  options: options,
+                  cancelButtonIndex: 0,
+                  userInterfaceStyle: 'light',
+                  destructiveButtonIndex: 1
+                },
+                buttonIndex => {
+                    buttonIndex != 0 ? setWorkout(workoutList[buttonIndex-1]) : ""
+                }
+              );
+        }
     }
 
     //pressing on exercise within search
@@ -74,7 +80,7 @@ export default function PostScreen({navigation}) {
     //close workout
     const endWorkout = async function(){
         let path = `${Date.now()}-${auth.currentUser.uid}`
-        uploadImagesToStorage(0, path);
+        uploadImagesToStorage(path);
         addDoc(collection(firestore, "posts"), {
             caption:"",
             comments:[],
@@ -91,6 +97,10 @@ export default function PostScreen({navigation}) {
         }).catch((e) => {
             Alert.alert("ERROR", e);
         })
+        setImages([])
+        setExercisesSearched([])
+        setWorkout({});
+        return;
     }
     
     //adding an exercise with "add exercise" button
@@ -135,32 +145,27 @@ export default function PostScreen({navigation}) {
         });
     };
 
-   async function uploadImagesToStorage(i, path) {
-        if(i >= images.length){
-            setImages([])
-            setExercisesSearched([])
-            setWorkout({});
-            return;
-        }
+   async function uploadImagesToStorage(path) {
         console.log("Uploading...")
-        let reference = ref(storage, path + i);
-        fetch(images[i]).then(async function(img){
-            img.blob().then(async function(bytes){
-                uploadBytesResumable(reference, bytes).then(x => {
-                    console.log("Upload Complete!")
-                    uploadImagesToStorage(i+1)
+        images.forEach((x, i) => {        
+            let reference = ref(storage, path + i);
+            fetch(x).then(async function(img){
+                img.blob().then(async function(bytes){
+                    uploadBytesResumable(reference, bytes).then(x => {
+                        console.log("Upload Complete!")
+                    }).catch(e => {
+                        console.error("error on upload")
+                        console.error(e)
+                    });
+                    return true
                 }).catch(e => {
-                    console.error("error on upload")
+                    console.error("error on blob")
                     console.error(e)
-                });
-                return true
+                })
             }).catch(e => {
-                console.error("error on blob")
+                console.error("error on fetch")
                 console.error(e)
-            })
-        }).catch(e => {
-            console.error("error on fetch")
-            console.error(e)
+            })   
         })
         return;
     }
