@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Text, View, Button, TextInput, Image, Alert} from 'react-native'
 import styles from './styles';
 import { ActionSheetIOS } from 'react-native';
@@ -8,7 +8,7 @@ import ExerciseSearchList from '../../components/ExerciseSearchList/ExerciseSear
 import * as ImagePicker from "expo-image-picker";
 import { storage, auth, firestore } from '../../firebase/config';
 import { ref, uploadBytesResumable } from 'firebase/storage';
-import { addDoc, collection, serverTimestamp, setDoc } from "firebase/firestore"
+import { addDoc, collection, query, where, serverTimestamp, getDocs } from "firebase/firestore"
 import { Feather } from '@expo/vector-icons';
 import { Platform } from 'react-native';
 
@@ -21,29 +21,23 @@ export default function PostScreen({navigation}) {
 
     //state for changing exercise search list
     const [exercisesSearched, setExercisesSearched] = useState([]);
+    
+    const [workoutList, setWorkoutList] = useState([]);
 
-    const [imageUploadIndex, setImageUploadIndex] = useState(0);
-
-    //mock workout data
-    const workoutList = [
-        {
-            name:"My Push Day",
-            exercises:["Bench Press", "Incline Dumbbell Press", "Seated Dumbbell Press", "Lateral Raises"]
-        },
-        {
-            name:"My Pull Day",
-            exercises:["Pull Ups", "Lat Pulldown", "Rows", "Single Arm Pulldown"]
-        },
-        {
-            name:"My Leg Day",
-            exercises:["Barbell Squats", "Goblet Squats", "Hamstring Curls", "Calf Raises"]
-        },
-        {
-            name:"My Arms Day",
-            exercises:["Curls", "More Curls", "Even More Curls", "Tricep Extensions Too"]
-        },
-    ]
-    workoutList.unshift({name:"New Workout", exercises: []})
+    useEffect(() => {
+        //get all workouts
+        const workouts = collection(firestore, "workouts")
+        const q = query(workouts, where("uid", "==", auth.currentUser.uid));
+        getDocs(q).then((x) => {
+            let tempWorkouts = []
+            x.forEach(workout => {
+                tempWorkouts.push(workout.data())
+            })
+            tempWorkouts.unshift({name:"New Workout", exercises: []});
+            setWorkoutList(tempWorkouts)
+        })
+    }, [])
+    
 
     //popup menu (action sheet)
     const openMenu = function(){
@@ -79,6 +73,14 @@ export default function PostScreen({navigation}) {
 
     //close workout
     const endWorkout = async function(){
+        if(!(workout in workoutList)){
+            const docRef = await addDoc(collection(firestore, "workouts"), {
+                name: workout.name,
+                exercises: workout.exercises,
+                uid: auth.currentUser.uid,
+                timestamp: serverTimestamp()
+            })
+        }
         let path = `${Date.now()}-${auth.currentUser.uid}`
         uploadImagesToStorage(path);
         addDoc(collection(firestore, "posts"), {
@@ -95,7 +97,7 @@ export default function PostScreen({navigation}) {
         }).then((x) => {
             console.log(x.id);
         }).catch((e) => {
-            Alert.alert("ERROR", e);
+            alert("ERROR", e);
         })
         setImages([])
         setExercisesSearched([])

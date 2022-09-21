@@ -43,9 +43,9 @@ export {HomeScreenNavigator}
 
 const SearchScreenNavigator = () => {
     return (
-        <Stack.Navigator screenOptions={{headerShown:false}}>
+        <Stack.Navigator>
             <Stack.Screen options={headerOptions} name="Search" component={SearchScreen}/>
-            <Stack.Screen options={headerOptions} name="Profile">
+            <Stack.Screen name="Profile">
                 {props => <ProfileScreen {...props}/>}
             </Stack.Screen>
         </Stack.Navigator>

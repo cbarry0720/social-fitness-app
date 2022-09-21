@@ -65,18 +65,17 @@ export default function ProfileScreen({route, navigation}) {
             alert("Image selected - firebase implementation coming soon");
         }
 
-        uploadImage = async (uri, imageName) => {
-            const response = await fetch(uri);
-            const blob = await response.blob();
+        // uploadImage = async (uri, imageName) => {
+        //     const response = await fetch(uri);
+        //     const blob = await response.blob();
         
-            let ref = firebase.storage().ref().child("images/" + imageName);
-            return ref.put(blob);
-          }
+        //     let ref = firebase.storage().ref().child("images/" + imageName);
+        //     return ref.put(blob);
+        //   }
         
       };
       useEffect( () => {
         let tempUserInfo = {}
-        console.log("USER DATA FOR PROFILE", userData)
         if(!userData){
             getDoc(doc(firestore, "users", auth.currentUser.uid)).then((x) => {
                 tempUserInfo = x.data()
@@ -84,7 +83,8 @@ export default function ProfileScreen({route, navigation}) {
             }).then(() => {
                 getDownloadURL(ref(storage, tempUserInfo.picture)).then((x) => {
                     setImage(x)
-                })}
+                })
+            }
             ).catch((error) => {
                 console.log(error)
             })

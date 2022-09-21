@@ -48,12 +48,17 @@ export default function Post({data}){
                 let temp = Object.assign({}, uData);
                 temp.picture = x;
                 setUserData(temp)
+            }).catch((e) => {
+                console.error(e)
             })
-        }).then(() => {
-
         })
+        if(data.images[0] == undefined){
+            return
+        }
         getDownloadURL(ref(storage, data.images[0])).then( (x) => {
             setImages([x])
+        }).catch((e) => {
+            console.error(e)
         })
     }, [data]);
 

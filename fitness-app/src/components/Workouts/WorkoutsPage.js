@@ -1,35 +1,18 @@
 import { useNavigation } from "@react-navigation/native";
-import React from "react";
+import { firestore, auth } from "../../firebase/config";
+import {React, useState, useEffect} from "react";
 import styles from "./styles";
+import { collection, getDocs, query, QuerySnapshot, where } from "firebase/firestore";
 import {View, Text, TouchableOpacity} from "react-native";
 import { FlatList, ScrollView } from "react-native-gesture-handler";
 import WorkoutScreen from "./WorkoutScreen";
 
 
-//mock workout data
-const workoutList = [
-    {
-        name:"My Push Day",
-        exercises:["Bench Press", "Incline Dumbbell Press", "Seated Dumbbell Press", "Lateral Raises"]
-    },
-    {
-        name:"My Pull Day",
-        exercises:["Pull Ups", "Lat Pulldown", "Rows", "Single Arm Pulldown"]
-    },
-    {
-        name:"My Leg Day",
-        exercises:["Barbell Squats", "Goblet Squats", "Hamstring Curls", "Calf Raises"]
-    },
-    {
-        name:"My Arms Day",
-        exercises:["Curls", "More Curls", "Even More Curls", "Tricep Extensions Too"]
-    }
-]
-
 export default function WorkoutsPage(){
 
+    const navigation = useNavigation();
 
-    const navigation = useNavigation()
+    const [workouts, setWorkouts] = useState([]);
 
     //on workout button press
     const clickWorkout = (x) => {
@@ -38,11 +21,27 @@ export default function WorkoutsPage(){
         }
     }
 
+    const getWorkoutData = () => {
+        const q = query(collection(firestore, "workouts"), where("uid", "==", auth.currentUser.uid));
+        getDocs(q).then((x) => {
+            let tempWorkouts = []
+            x.forEach(workout => {
+                tempWorkouts.push(workout.data())
+            })
+            setWorkouts(tempWorkouts)
+        })
+    }
+
+    useEffect(() => {
+        getWorkoutData();
+    }, [])
+    
+
     //JSX for List of Workouts withing Profile Page
     return (
     <View>
         <ScrollView style={styles.container}>
-            {workoutList.map((x, i) => (
+            {workouts.map((x, i) => (
                 <TouchableOpacity key={i} onPress={clickWorkout(x)} style={styles.item_container}>
                 {/* <TouchableOpacity onPress={navigation.navigate("My Workout", x)}> */}
                     <Text style={{fontSize:20}}>{x.name}</Text>

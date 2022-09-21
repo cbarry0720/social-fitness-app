@@ -36,7 +36,7 @@ export default function SearchScreen({navigation}) {
     const openUser = (userData) => {
         return () => {
             console.log("USERDATA IN SEARCHSCREEN", userData)
-            navigation.navigate("Profile", {userDataParam: userData})
+            navigation.push("Profile", {userDataParam: userData})
         }
     }
 
