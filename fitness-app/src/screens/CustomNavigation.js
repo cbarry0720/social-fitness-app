@@ -1,13 +1,13 @@
 import React from "react";
 import {createStackNavigator} from "@react-navigation/stack";
-import { TouchableOpacity } from "react-native";
+import { Platform, TouchableOpacity } from "react-native";
 import {Ionicons} from "react-native-vector-icons";
 import HomeScreen from "./HomeScreen/HomeScreen";
 import SearchScreen from "./SearchScreen/SearchScreen";
 import PostScreen from "./PostScreen/PostScreen";
 import MapScreen from "./MapScreen/MapScreen";
 import ProfileScreen from "./ProfileScreen/ProfileScreen";
-import { Text } from "react-native";
+import { Image } from "react-native";
 import WorkoutScreen from "../components/Workouts/WorkoutScreen";
 
 const Stack = createStackNavigator();
@@ -20,7 +20,7 @@ const headerOptions = {
     </TouchableOpacity>),
     headerTitle: () => (
     <TouchableOpacity>
-        <Text>Logo Here</Text>
+        <Image style={{width:150, height:40}} source={Platform.OS == "web" ? {uri: require("../../assets/fitfluence-light.jpg")} : require("../../assets/fitfluence-light.jpg")}/>
     </TouchableOpacity>),
     headerRight: () => (
     <TouchableOpacity>

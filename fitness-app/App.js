@@ -35,7 +35,6 @@ export default function App() {
             const userData = document.data()
             setLoading(false)
             setUser(userData)
-            console.log(userData)
           })
           .catch((error) => {
             console.error(error)

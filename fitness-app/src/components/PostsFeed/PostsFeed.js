@@ -6,43 +6,6 @@ import { auth, firestore, storage } from "../../firebase/config";
 import {collection, query, where, orderBy, getDocs, getDoc, doc} from "firebase/firestore"
 import { getDownloadURL, ref } from "firebase/storage";
 
-//mock post data
-let postings = [
-    {
-        id:1,
-        username:"cbarry0720",
-        pfp: 'profile',
-        location:"bfit",
-        images: ["gym1"],
-        workout: ["Bench Press", "Shoulder Press"],
-        caption: "I love working out",
-        comments: [],
-        timePosted: new Date(2022, 6, 21, 15, 15)
-    },
-    {
-        id:2,
-        username:"tim",
-        pfp: "timprofile",
-        location:"Bridgewater Fitness",
-        images: ["gym1", "gym2"],
-        workout: ["Squats", "Calf Raises"],
-        caption: "bfit is awesome",
-        comments: [],
-        timePosted: new Date(2022, 6, 21, 15, 15)
-    },
-    {
-        id:3,
-        username:"cbarry0720",
-        pfp: 'profile',
-        location:"bfit",
-        images: ["gym2"],
-        workout: ["Pull Ups", "Rows"],
-        caption: "the Y sucks",
-        comments: [{userId: 1, comment: "HELLO"}, {userId: 0, comment: "HI"}],
-        timePosted: new Date(2022, 6, 21, 15, 15)
-    }
-]
-
 
 
 export default function PostsFeed({profilePage, userId}){
@@ -79,7 +42,7 @@ export default function PostsFeed({profilePage, userId}){
             id:id,
             userId: data.userId, //TODO: Change Post.js from username, pfp to userId
             location: data.location,
-            images: [data.images[0]],
+            images: data.images,
             workout: data.exercises,
             caption: data.caption,
             comments: data.comments,

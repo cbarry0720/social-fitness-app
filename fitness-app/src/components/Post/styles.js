@@ -27,5 +27,8 @@ export default StyleSheet.create({
     },
     caption:{
         marginTop: 5
+    },
+    wrapper:{
+        height: 385
     }
 })

@@ -1,18 +1,10 @@
 import React, { useEffect, useState } from "react";
 import styles from "./styles";
-import { gym1, gym2, profile, timprofile } from "../../images";
 import {View, Text, Image} from "react-native";
 import { firestore, storage } from "../../firebase/config";
 import { getDownloadURL, ref } from "firebase/storage";
 import { doc, getDoc } from "firebase/firestore";
-
-//mock images
-const imgMap = {
-    gym1: gym1,
-    gym2: gym2,
-    profile: profile,
-    timprofile: timprofile,
-}
+import Swiper from 'react-native-swiper'
 
 //calculate time since post
 const getTimeDiff = function(time){
@@ -55,11 +47,16 @@ export default function Post({data}){
         if(data.images[0] == undefined){
             return
         }
-        getDownloadURL(ref(storage, data.images[0])).then( (x) => {
-            setImages([x])
-        }).catch((e) => {
-            console.error(e)
+        let tempImages = []
+        data.images.map((img) => {
+            getDownloadURL(ref(storage, img)).then( (x) => {
+                tempImages.push(x)
+            }).catch((e) => {
+                console.error(e)
+            })
         })
+        console.log(data, tempImages)
+        setImages(tempImages)
     }, [data]);
 
     // data = data.item
@@ -75,7 +72,11 @@ export default function Post({data}){
                 </View>
                 <Text>{getTimeDiff(data.timePosted)}</Text>
             </View>
-            <Image style={styles.image} source={{uri: images[0]}}/>
+            <Swiper paginationStyle={styles.pagination} style={styles.wrapper} loop={false}>
+                {images.map((x, i) => 
+                <Image key={x} style={styles.image} source={{uri: x}}/>
+                )}
+            </Swiper>
             <Text style={styles.caption}>{data.caption}</Text>
             {data.comments.length > 0 ? <Text>View Comments</Text> : <></>}
         </View>

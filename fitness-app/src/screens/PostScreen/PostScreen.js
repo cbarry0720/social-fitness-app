@@ -41,7 +41,6 @@ export default function PostScreen({navigation}) {
 
     //popup menu (action sheet)
     const openMenu = function(){
-        console.log(Platform.OS)
         if(Platform.OS == "web"){
             setWorkout(workoutList[0])
         }
