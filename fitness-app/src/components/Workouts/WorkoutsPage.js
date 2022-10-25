@@ -32,6 +32,7 @@ export default function WorkoutsPage(){
         })
     }
 
+    //get workout data on load
     useEffect(() => {
         getWorkoutData();
     }, [])

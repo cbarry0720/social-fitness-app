@@ -33,6 +33,9 @@ export default function PostScreen({ navigation }) {
 	//state for workout list in post
 	const [workoutList, setWorkoutList] = useState([]);
 
+	//state used for each exercises sets (hashmap)
+	const [sets, setSets] = useState({});
+
 	useEffect(() => {
 		//get all workouts
 		const workouts = collection(firestore, "workouts");
@@ -210,6 +213,20 @@ export default function PostScreen({ navigation }) {
 		};
 	};
 
+	const addSet = (exercise) => {
+		return () => {
+			let temp = Object.assign({}, sets);
+			if (exercise in sets) {
+				temp[exercise].push({ weight: 0, reps: 0 });
+			} else {
+				temp[exercise] = [{ weight: 0, reps: 0 }];
+			}
+			setSets(temp);
+		};
+	};
+
+	console.log(sets);
+
 	//starting page
 	if (Object.values(workout).length == 0) {
 		return (
@@ -231,22 +248,65 @@ export default function PostScreen({ navigation }) {
 				</Text>
 				{workout.exercises.map((x) => {
 					return x != null ? (
-						<View style={styles.item} key={x}>
-							<Text style={styles.exercise}>{x}</Text>
-							<View style={styles.right_side}>
-								<TouchableHighlight style={styles.pr}>
-									<Text style={{ color: "#BA9B00" }}>PR</Text>
-								</TouchableHighlight>
-								<TouchableHighlight style={styles.plus}>
-									<Text
-										style={{
-											fontSize: 24,
-											fontWeight: "bold",
-										}}
+						<View>
+							<View style={styles.item} key={x}>
+								<Text style={styles.exercise}>{x}</Text>
+								<View style={styles.right_side}>
+									<TouchableHighlight style={styles.pr}>
+										<Text style={{ color: "#BA9B00" }}>
+											PR
+										</Text>
+									</TouchableHighlight>
+									<TouchableHighlight
+										onPress={addSet(x)}
+										style={styles.plus}
 									>
-										+
-									</Text>
-								</TouchableHighlight>
+										<Text
+											style={{
+												fontSize: 24,
+												fontWeight: "bold",
+											}}
+										>
+											+
+										</Text>
+									</TouchableHighlight>
+								</View>
+							</View>
+							<View style={styles.set_container}>
+								{x in sets && sets[x].length > 0 ? (
+									<View style={styles.set}>
+										<Text>Weight (lbs)</Text>
+										<Text>Reps</Text>
+									</View>
+								) : (
+									<></>
+								)}
+								{x in sets ? (
+									sets[x].map((x, i) => {
+										return (
+											<View style={styles.set}>
+												<TextInput
+													onChangeText={updateWeight(
+														x,
+														i
+													)}
+													style={styles.set_input}
+													placeholder={x.weight}
+												/>
+												<TextInput
+													onChangeText={updateReps(
+														x,
+														i
+													)}
+													style={styles.set_input}
+													placeholder={x.reps}
+												/>
+											</View>
+										);
+									})
+								) : (
+									<></>
+								)}
 							</View>
 						</View>
 					) : (

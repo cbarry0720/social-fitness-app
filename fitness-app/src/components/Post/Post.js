@@ -61,7 +61,6 @@ export default function Post({ data }) {
 					console.error(e);
 				});
 		});
-		console.log(data, tempImages);
 		setImages(tempImages);
 	}, [data]);
 
